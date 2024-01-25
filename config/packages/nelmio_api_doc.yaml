@@ -1,9 +1,9 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My pen API
-            description: API de stylos
-            version: 1.0.0
+            title: "My API"
+            description: "Description de mon API."
+            version: "1.0.0"
         components:
             securitySchemes:
                 Bearer:
@@ -12,8 +12,6 @@ nelmio_api_doc:
                     bearerFormat: JWT
         security:
             - Bearer: []
-    areas: # to filter documented areas
+    areas:
         path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
-        host_patterns: # document only routes with a host of the form api.*
-            - ^api\.
+            - ^/api(?!/doc$)

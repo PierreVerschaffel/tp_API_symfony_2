@@ -125,7 +125,6 @@ class PenController extends AbstractController
                 'message' => $e->getMessage()
             ], 500);
         }
-        
     }
 
     #[Route('/pen/{id}', name: 'app_pen_update', methods: ['PUT','PATCH'])]
