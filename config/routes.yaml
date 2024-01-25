@@ -6,6 +6,7 @@ controllers:
 
 api_login_check:
     path: /api/login_check
+    stateless: false
 
 app.swagger_ui:
     path: /api/doc

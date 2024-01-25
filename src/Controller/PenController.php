@@ -10,6 +10,7 @@ use App\Repository\TypeRepository;
 use App\Repository\BrandRepository;
 use App\Repository\ColorRepository;
 use App\Repository\MaterialRepository;
+use App\Service\PenService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -57,68 +58,13 @@ class PenController extends AbstractController
     #[Route('/pens', name: 'app_pen_add', methods: ['POST'])]
     #[OA\Tag(name: 'Stylos')]
     public function add(
-        EntityManagerInterface $entityManager,
         Request $request,
-        TypeRepository $typeRepository,
-        MaterialRepository $materialRepository,
-        BrandRepository $brandRepository,
-        ColorRepository $colorRepository
+        PenService $penService
     ): JsonResponse {
         try {
-            $data = json_decode($request->getContent(), true);
+            $pen = $penService->createFromJsonString($request->getContent());
 
-            $faker = Factory::create();
-
-            $pen = new Pen();
-            $pen->setName($data['name']);
-            $pen->setPrice($data['price']);
-            $pen->setDescription($data['description']);
-            $pen->setRef($faker->unique()->ean13);
-
-            if (!empty($data['type'])) {
-                $type = $typeRepository->find($data['type']);
-
-                if (!$type) {
-                    throw new \Exception("Le type renseigné n'existe pas ");
-                }
-
-                $pen->setType($type);
-            }
-
-            if (!empty($data['material'])) {
-                $material = $materialRepository->find($data['material']);
-
-                if (!$material) {
-                    throw new \Exception("Le material renseigné n'existe pas ");
-                }
-
-                $pen->setMaterial($material);
-            }
-
-            if (!empty($data['brand'])) {
-                $brand = $brandRepository->find($data['brand']);
-
-                if (!$brand) {
-                    throw new \Exception("La marque renseigné n'existe pas ");
-                }
-
-                $pen->setBrand($brand);
-            }
-
-            if(!empty($data['color'])) {
-                $color = $colorRepository->find($data['color']);
-
-                if(!$color) {
-                    throw new \Exception("La couleur renseigné n'existe pas ");
-                }
-            }
-
-            $entityManager->persist($pen);
-            $entityManager->flush();
-
-            return $this->json([
-                'pen' => $pen,
-            ], context: ['groups' => 'pen:read']);
+            return $this->json($pen, context: ['groups' => 'pen:read']);
         } catch (\Exception $e) {
             return $this->json([
                 'code' => $e->getCode(),
@@ -131,55 +77,13 @@ class PenController extends AbstractController
     #[OA\Tag(name: 'Stylos')]
     public function update(
         Pen $pen,
-        EntityManagerInterface $entityManager,
         Request $request,
-        TypeRepository $typeRepository,
-        MaterialRepository $materialRepository,
-        BrandRepository $brandRepository
+        PenService $penService
     ): JsonResponse {
         try {
-            $data = json_decode($request->getContent(), true);
+            $penService->updateWithJsonData($pen, $request->getContent());
 
-            $pen->setName($data['name']);
-            $pen->setPrice($data['price']);
-            $pen->setDescription($data['description']);
-
-            if (!empty($data['type'])) {
-                $type = $typeRepository->find($data['type']);
-
-                if (!$type) {
-                    throw new \Exception("Le type renseigné n'existe pas ");
-                }
-
-                $pen->setType($type);
-            }
-
-            if (!empty($data['material'])) {
-                $material = $materialRepository->find($data['material']);
-
-                if (!$material) {
-                    throw new \Exception("Le material renseigné n'existe pas ");
-                }
-
-                $pen->setMaterial($material);
-            }
-
-            if (!empty($data['brand'])) {
-                $brand = $brandRepository->find($data['brand']);
-
-                if (!$brand) {
-                    throw new \Exception("Le brand renseigné n'existe pas ");
-                }
-
-                $pen->setBrand($brand);
-            }
-
-            // $entityManager->persist($pen);
-            $entityManager->flush();
-
-            return $this->json([
-                'pen' => $pen,
-            ], context: ['groups' => 'pen:read']);
+            return $this->json($pen, context: ['groups' => 'pen:read']);
         } catch (\Exception $e) {
             return $this->json([
                 'code' => $e->getCode(),

@@ -7,12 +7,13 @@ use OpenApi\Attributes as OA;
 use App\Repository\ColorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Bundle\SecurityBundle\Security;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/api', name: 'api_')]
 class ColorController extends AbstractController
 {
     #[Route('/color', name: 'app_color', methods: ['GET'])]

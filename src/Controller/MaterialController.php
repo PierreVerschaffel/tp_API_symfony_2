@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 use App\Repository\MaterialRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Bundle\SecurityBundle\Security;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -71,7 +71,7 @@ class MaterialController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $material->setName($data['name']);
-
+        
         $em->persist($material);
         $em->flush();
 

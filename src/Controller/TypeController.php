@@ -7,11 +7,12 @@ use OpenApi\Attributes as OA;
 use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Bundle\SecurityBundle\Security;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use TypeService;
 
 #[Route('/api', name: 'api_')]
 class TypeController extends AbstractController
@@ -27,8 +28,9 @@ class TypeController extends AbstractController
     )]
     #[OA\Tag(name: 'Type')]
     #[Security(name: 'Bearer')]
-    public function index(TypeRepository $typeRepository): Response
-    {
+    public function index(
+        TypeRepository $typeRepository
+    ): Response {
         $types = $typeRepository->findAll();
 
         return $this->json([
@@ -39,38 +41,36 @@ class TypeController extends AbstractController
     }
 
     #[Route('/type/{id}', name: 'app_type_get', methods: ['GET'])]
-    public function get(Type $type): Response
-    {
+    #[OA\Tag(name: 'Type')]
+    public function get(
+        Type $type
+    ): Response {
         return $this->json([
             'type' => $type,
         ], context: ['groups' => 'pen:read']);
     }
 
     #[Route('/type', name: 'app_type_add', methods: ['POST'])]
-    public function add(Request $request, EntityManagerInterface $em): Response
-    {
-        $data = json_decode($request->getContent(), true);
+    #[OA\Tag(name: 'Type')]
+    public function add(
+        Request $request,
+        TypeService $typeService
+    ): Response {
 
-        $type = new Type();
-        $type->setName($data['name']);
+        $type = $typeService->createFromJsonString($request->getContent());
 
-        $em->persist($type);
-        $em->flush();
-
-        return $this->json([
-            'type' => $type,
-        ], context: ['groups' => 'pen:read']);
+        return $this->json($type, context: ['groups' => 'pen:read']);
     }
 
-    #[Route('/type/{id}', name: 'app_type_update', methods: ['PUT','PATCH'])]
-    public function update(Request $request, Type $type, EntityManagerInterface $em): Response
-    {
-        $data = json_decode($request->getContent(), true);
+    #[Route('/type/{id}', name: 'app_type_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Tag(name: 'Type')]
+    public function update(
+        Request $request,
+        Type $type,
+        TypeService $typeService
+    ): Response {
 
-        $type->setName($data['name']);
-
-        $em->persist($type);
-        $em->flush();
+        $typeService->updateWithJsonData($type, $request->getContent());
 
         return $this->json([
             'type' => $type,
@@ -78,6 +78,7 @@ class TypeController extends AbstractController
     }
 
     #[Route('/type/{id}', name: 'app_type_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Type')]
     public function delete(Type $type, EntityManagerInterface $em): Response
     {
         $em->remove($type);
